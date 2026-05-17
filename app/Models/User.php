@@ -29,4 +29,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function rigs()
+    {
+        return $this->hasMany(Rig::class);
+    }
 }
