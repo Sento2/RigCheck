@@ -21,5 +21,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Tambahkan baris ini untuk memanggil data hardware kita
+        $this->call([
+            ComponentSeeder::class,
+        ]);
     }
 }
