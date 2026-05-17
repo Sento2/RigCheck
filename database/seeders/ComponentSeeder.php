@@ -48,5 +48,21 @@ class ComponentSeeder extends Seeder
             'wattage' => 5,
             'spesifikasi' => ['speed' => '5200MHz', 'type' => 'DDR5']
         ]);
+
+        Component::create([
+            'name' => 'MSI Bravo 15 B5DD',
+            'category' => 'base_system',
+            'price' => 12000000,
+            'wattage' => 150,
+            'spesifikasi' => ['cpu_socket' => 'FP6 (Soldered)', 'ram_type' => 'DDR4', 'ram_slots' => 2, 'storage_slots' => ['M.2 NVMe PCIe Gen 3']]
+        ]);
+
+        Component::create([
+            'name' => 'Corsair Vengeance LPX 16GB DDR4',
+            'category' => 'ram',
+            'price' => 850000,
+            'wattage' => 5,
+            'spesifikasi' => ['speed' => '3200MHz', 'type' => 'DDR4']
+        ]);
     }
 }
