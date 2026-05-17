@@ -14,14 +14,16 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/login', [AuthController::class, 'loginProcess'])->name('login.process');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.process');
 
 // ==========================================
 // ROUTE HALAMAN UTAMA / DASHBOARD (WAJIB LOGIN)
 // ==========================================
-Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
     
     // Halaman Utama setelah Login (bisa diarahkan ke list rakitan)
     Route::get('/dashboard', [RigController::class, 'index'])->name('dashboard');
@@ -29,7 +31,9 @@ Route::middleware(['auth'])->group(function () {
     // 1. Fitur Manajemen Komponen PC
     Route::get('/components', [ComponentController::class, 'index'])->name('components.index');
     Route::get('/components/{id}', [ComponentController::class, 'show'])->name('components.show');
-    Route::post('/admin/components', [ComponentController::class, 'store'])->name('components.store'); // Untuk input komponen baru oleh Admin
+    Route::post('/admin/components', [ComponentController::class, 'store'])->name('components.store');
+    Route::get('/builder', [ComponentController::class, 'builder'])->name('builder.index');
+    // Untuk input komponen baru oleh Admin
 
     // 2. Fitur Rakit Komputer (Rig)
     Route::get('/rigs', [RigController::class, 'index'])->name('rigs.index');

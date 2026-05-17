@@ -41,4 +41,14 @@ class ComponentController extends Controller
         Component::create($validated);
         return back()->with('success', 'Komponen berhasil ditambah, bro!');
     }
+
+    public function builder()
+    {
+        // Tarik semua komponen dan kelompokkan berdasarkan kategori
+        $components = Component::all()->groupBy('category');
+        
+        // Lempar ke tampilan builder (tempat kamu menaruh desain Stitch AI)
+        return view('pages.rigs.builder', compact('components'));
+    }
+
 }
