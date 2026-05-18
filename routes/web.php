@@ -44,11 +44,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/components/{id}', [ComponentController::class, 'show'])->name('components.show');
 
     // Rakitan (Rig)
-    Route::get('/rigs',                  [RigController::class, 'index'])->name('rigs.index');
-    Route::post('/rigs',                 [RigController::class, 'store'])->name('rigs.store');
-    Route::get('/rigs/{id}',             [RigController::class, 'show'])->name('rigs.show');
-    Route::post('/rigs/add-component',   [RigController::class, 'addComponent'])->name('rigs.add_component');
-    Route::post('/rigs/remove-component',[RigController::class, 'removeComponent'])->name('rigs.remove_component');
+    Route::get('/rigs',                   [RigController::class, 'index'])->name('rigs.index');
+    Route::post('/rigs',                  [RigController::class, 'store'])->name('rigs.store');
+    Route::get('/rigs/{id}',              [RigController::class, 'show'])->name('rigs.show');
+    Route::post('/rigs/add-component',    [RigController::class, 'addComponent'])->name('rigs.add_component');
+    Route::post('/rigs/remove-component', [RigController::class, 'removeComponent'])->name('rigs.remove_component');
+    Route::post('/rigs/{id}/save',        [RigController::class, 'saveRig'])->name('rigs.save');
+    Route::delete('/rigs/{id}',           [RigController::class, 'deleteRig'])->name('rigs.delete');
 
     // Kompatibilitas
     Route::get('/rigs/{id}/compatibility', [CompatibilityController::class, 'index'])->name('compatibility.index');

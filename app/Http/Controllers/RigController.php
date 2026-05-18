@@ -112,4 +112,43 @@ class RigController extends Controller
 
         $rig->save();
     }
+
+    /**
+     * Simpan (finalisasi) rakitan — ubah status dari draft ke selesai.
+     */
+    public function saveRig(Request $request, int $id): RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $rig = Rig::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        if ($rig->components()->count() === 0) {
+            return back()->with('error', 'Rakitan masih kosong. Tambahkan komponen terlebih dahulu.');
+        }
+
+        $rig->name         = $request->name;
+        $rig->is_completed = true;
+        $rig->save();
+
+        return back()->with('success', "Rakitan '{$rig->name}' berhasil disimpan!");
+    }
+
+    /**
+     * Hapus rakitan beserta semua komponennya.
+     */
+    public function deleteRig(int $id): RedirectResponse
+    {
+        $rig = Rig::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $rig->components()->detach();
+        $rig->delete();
+
+        return back()->with('success', 'Rakitan berhasil dihapus.');
+    }
 }
