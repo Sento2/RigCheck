@@ -2,59 +2,114 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Rig;
 use App\Models\Component;
+use App\Models\Rig;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class RigController extends Controller
 {
-    // Menampilkan list rakitan milik user yang sedang login
-    public function index()
+    /**
+     * Tampilkan daftar rakitan milik pengguna yang login.
+     */
+    public function index(): View
     {
-        $rigs = Rig::where('user_id', Auth::id())->with('components')->latest()->get();
-        return view('rigs.index', compact('rigs'));
+        $rigs = Rig::where('user_id', Auth::id())
+            ->with('components')
+            ->latest()
+            ->get();
+
+        return view('pages.admin.dashboard', compact('rigs'));
     }
 
-    // Proses membuat Rig kosong baru
-    public function store(Request $request)
+    /**
+     * Buat rakitan baru.
+     */
+    public function store(Request $request): RedirectResponse
     {
         $request->validate(['name' => 'required|string|max:255']);
 
         $rig = Rig::create([
             'user_id' => Auth::id(),
-            'name' => $request->name,
+            'name'    => $request->name,
         ]);
 
         return redirect()->route('rigs.show', $rig->id);
     }
 
-    // Menampilkan detail item rakitan di dalam Rig beserta total kalkulasi harga & watt
-    public function show($id)
+    /**
+     * Tampilkan detail rakitan beserta kalkulasi total.
+     */
+    public function show(int $id): View
     {
-        $rig = Rig::where('user_id', Auth::id())->with('components')->findOrFail($id);
-        
-        $totalPrice = 0;
-        $totalWattage = 0;
+        $rig = Rig::where('user_id', Auth::id())
+            ->with('components')
+            ->findOrFail($id);
 
-        foreach ($rig->components as $component) {
-            $totalPrice += $component->price * $component->pivot->quantity;
-            $totalWattage += $component->wattage * $component->pivot->quantity;
-        }
+        $totalPrice   = $rig->components->sum(fn ($c) => $c->price * $c->pivot->quantity);
+        $totalWattage = $rig->components->sum(fn ($c) => $c->wattage * $c->pivot->quantity);
 
         return view('rigs.show', compact('rig', 'totalPrice', 'totalWattage'));
     }
 
-    // Menambahkan komponen ke dalam Rig rakitan (Tabel Pivot component_rig)
-    public function addComponent(Request $request, $rigId)
+    /**
+     * Tambahkan komponen ke keranjang rakitan aktif.
+     */
+    public function addComponent(Request $request): RedirectResponse
     {
-        $rig = Rig::where('user_id', Auth::id())->findOrFail($rigId);
-        
-        // Pasang atau update quantity jika komponen sudah ada di keranjang rakitan
-        $rig->components()->syncWithoutDetaching([
-            $request->component_id => ['quantity' => $request->get('quantity', 1)]
+        $request->validate([
+            'component_id' => 'required|exists:components,id',
         ]);
 
-        return back()->with('success', 'Komponen berhasil dimasukkan ke rakitan!');
+        $rig = Rig::firstOrCreate(
+            ['user_id' => Auth::id(), 'is_completed' => false],
+            ['name'    => 'Project Rig - ' . now()->format('Y-m-d')]
+        );
+
+        $quantity = $request->integer('quantity', 1);
+
+        $rig->components()->syncWithoutDetaching([
+            $request->component_id => ['quantity' => $quantity],
+        ]);
+
+        $this->recalculateTotals($rig);
+
+        return back()->with('success', 'Hardware berhasil ditambahkan ke keranjang!');
+    }
+
+    /**
+     * Hapus komponen dari keranjang rakitan.
+     */
+    public function removeComponent(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'component_id' => 'required|exists:components,id',
+            'rig_id'       => 'required|exists:rigs,id',
+        ]);
+
+        $rig = Rig::where('id', $request->rig_id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $rig->components()->detach($request->component_id);
+
+        $this->recalculateTotals($rig);
+
+        return back()->with('success', 'Hardware berhasil dihapus dari keranjang.');
+    }
+
+    /**
+     * Hitung ulang total harga dan daya rakitan.
+     */
+    private function recalculateTotals(Rig $rig): void
+    {
+        $rig->load('components');
+
+        $rig->total_price   = $rig->components->sum(fn ($c) => $c->price * ($c->pivot->quantity ?? 1));
+        $rig->total_wattage = $rig->components->sum(fn ($c) => $c->wattage * ($c->pivot->quantity ?? 1));
+
+        $rig->save();
     }
 }

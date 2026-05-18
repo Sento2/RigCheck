@@ -3,65 +3,132 @@
 @section('title', 'Workspace Builder')
 
 @section('content')
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant shadow-sm flex items-center gap-6">
-            <div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
-                <span class="material-symbols-outlined">payments</span>
-            </div>
-            <div>
-                <p class="text-on-surface-variant font-label-tech text-xs uppercase">Estimasi Harga (Keranjang)</p>
-                <p class="font-headline-lg text-2xl font-bold text-on-surface">Rp 0</p>
-            </div>
+<div class="px-8 py-8 pb-24 w-full max-w-6xl mx-auto">
+    <div class="mb-10 flex items-center justify-between">
+        <div>
+            <h1 class="text-[36px] font-medium text-ink tracking-[-0.72px] mb-2">Katalog Hardware</h1>
+            <p class="text-[16px] text-ink-mute leading-[1.5]">Pilih komponen untuk rakitan Anda.</p>
         </div>
-        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant shadow-sm flex items-center gap-6">
-            <div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary-container">
-                <span class="material-symbols-outlined">bolt</span>
+        
+        <!-- Rig summary pane -->
+        <div class="flex gap-4">
+            <div class="bg-canvas border border-hairline rounded-[12px] px-6 py-4 flex flex-col justify-center min-w-[200px]">
+                <p class="text-[12px] text-ink-mute uppercase tracking-widest font-medium mb-1">Total Daya</p>
+                <p class="text-[28px] font-medium text-ink leading-[1.2] tracking-[-0.42px]">
+                    {{ $currentRig ? $currentRig->total_wattage : '0' }} <span class="text-[18px] text-ink-mute">W</span>
+                </p>
             </div>
-            <div>
-                <p class="text-on-surface-variant font-label-tech text-xs uppercase">Estimasi Daya</p>
-                <p class="font-headline-lg text-2xl font-bold text-on-surface">0 W</p>
+            <div class="bg-canvas-night border border-hairline rounded-[12px] px-6 py-4 flex flex-col justify-center min-w-[250px]">
+                <p class="text-[12px] text-on-dark/70 uppercase tracking-widest font-medium mb-1">Estimasi Biaya</p>
+                <p class="text-[28px] font-medium text-on-dark leading-[1.2] tracking-[-0.42px]">
+                    <span class="text-[18px] text-on-dark/70">Rp</span> {{ $currentRig ? number_format($currentRig->total_price, 0, ',', '.') : '0' }}
+                </p>
             </div>
         </div>
     </div>
 
-    <div class="space-y-4">
-        <h3 class="font-headline-lg-mobile text-2xl font-bold text-on-surface mb-6">Katalog Hardware</h3>
+    @if(session('success'))
+        <div class="mb-8 p-4 bg-primary-soft/10 border border-primary rounded-[8px] flex items-center gap-3 text-ink">
+            <span class="material-symbols-outlined text-primary">check_circle</span>
+            <p class="text-[14px] font-medium">{{ session('success') }}</p>
+        </div>
+    @endif
 
-        @foreach($components as $category => $items)
-            <h4 class="font-label-tech text-primary uppercase mt-8 mb-2 border-b border-outline-variant pb-2 tracking-widest text-xs">
-                ⚡ Kategori: {{ str_replace('_', ' ', $category) }}
-            </h4>
-            
-            @foreach($items as $item)
-                <div class="bg-surface-variant border border-outline-variant rounded-xl p-4 flex items-center justify-between group hover:border-primary/50 transition-colors">
-                    <div class="flex items-center gap-6">
-                        <div class="w-16 h-16 bg-surface-container-lowest rounded-lg border border-outline-variant flex items-center justify-center text-primary shadow-inner">
-                            <span class="material-symbols-outlined text-3xl">developer_board</span>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="bg-primary/10 text-primary font-label-tech text-[10px] px-2 py-0.5 rounded uppercase font-bold">{{ $item->category }}</span>
-                                <span class="bg-surface-container-highest text-on-surface-variant font-label-tech text-[10px] px-2 py-0.5 rounded uppercase">{{ $item->wattage }}W Daya</span>
-                            </div>
-                            <h4 class="font-headline-lg-mobile text-lg font-bold text-on-surface mt-1 group-hover:text-primary transition-colors">{{ $item->name }}</h4>
-                            
-                            <p class="text-xs text-on-surface-variant mt-1 font-mono bg-background/40 py-1 px-2 rounded inline-block">
-                                @foreach($item->spesifikasi as $key => $val)
-                                    @if(!is_array($val)) 
-                                        <span class="text-primary/70">{{ ucfirst($key) }}:</span> <span class="text-on-surface mr-2">{{ $val }}</span>
-                                    @endif
-                                @endforeach
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-6">
-                        <span class="font-headline-lg-mobile text-xl font-bold text-on-surface">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
-                        <button class="text-primary hover:bg-primary hover:text-on-primary p-2 rounded-lg transition-all border border-primary/20 active:scale-95">
-                            <span class="material-symbols-outlined">add_shopping_cart</span>
-                        </button>
-                    </div>
+    <div id="component-list" class="space-y-12">
+
+        @php
+        $categoryIcons = [
+            'cpu'         => 'memory',
+            'gpu'         => 'developer_board',
+            'motherboard' => 'dns',
+            'ram'         => 'memory_alt',
+            'storage'     => 'hard_drive',
+            'psu'         => 'power',
+            'base_system' => 'laptop_mac',
+        ];
+        @endphp
+
+        @forelse($components as $category => $items)
+            <div>
+                {{-- Category header --}}
+                <h4 class="text-[14px] font-medium text-ink-mute uppercase tracking-widest mb-4 flex items-center gap-2.5">
+                    <span class="w-1.5 h-1.5 bg-primary rounded-full block"></span>
+                    {{ ucwords(str_replace('_', ' ', $category)) }}
+                    <span class="text-ink-faint font-normal normal-case tracking-normal">· {{ $items->count() }} item</span>
+                </h4>
+
+                {{-- Hardware cards --}}
+                <div class="grid grid-cols-1 gap-3">
+                    @foreach($items as $item)
+                        @php $icon = $categoryIcons[$item->category] ?? 'developer_board'; @endphp
+                        <x-hardware-card :item="$item" :icon="$icon" />
+                    @endforeach
                 </div>
-            @endforeach
-        @endforeach
+            </div>
+        @empty
+            <div class="py-24 text-center">
+                <div class="w-16 h-16 bg-canvas-soft rounded-full border border-hairline flex items-center justify-center mx-auto mb-5">
+                    <span class="material-symbols-outlined text-[28px] text-ink-faint">inventory_2</span>
+                </div>
+                <p class="text-[17px] font-medium text-ink mb-2">Tidak ada komponen ditemukan</p>
+                <p class="text-[14px] text-ink-mute">Coba pilih kategori yang berbeda.</p>
+            </div>
+        @endforelse
+
     </div>
+</div>
+
+
+
+<script>
+(() => {
+    const listEl = document.getElementById('component-list');
+    if (!listEl) return;
+
+    const setLoading = (active) => {
+        listEl.style.opacity       = active ? '0.5' : '';
+        listEl.style.pointerEvents = active ? 'none' : '';
+    };
+
+    const setActiveLink = (activeLink) => {
+        document.querySelectorAll('#sidebar-wrapper a').forEach(a => {
+            a.classList.remove('bg-hairline-cool', 'text-ink');
+            a.classList.add('text-ink-mute');
+        });
+        activeLink.classList.add('bg-hairline-cool', 'text-ink');
+        activeLink.classList.remove('text-ink-mute');
+    };
+
+    document.addEventListener('click', async (e) => {
+        const link = e.target.closest('#sidebar-wrapper a[href*="builder"]');
+        if (!link) return;
+
+        e.preventDefault();
+        const url = link.href;
+
+        setActiveLink(link);
+        setLoading(true);
+
+        try {
+            const separator = url.includes('?') ? '&' : '?';
+            const res       = await fetch(`${url}${separator}_ajax=1`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const html    = await res.text();
+            const doc     = new DOMParser().parseFromString(html, 'text/html');
+            const newList = doc.getElementById('component-list');
+
+            if (newList) {
+                listEl.innerHTML = newList.innerHTML;
+            }
+
+            history.pushState(null, '', url);
+        } catch {
+            window.location.href = url;
+        } finally {
+            setLoading(false);
+        }
+    });
+})();
+</script>
 @endsection

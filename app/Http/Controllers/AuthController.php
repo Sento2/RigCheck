@@ -4,78 +4,82 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    // 1. Menampilkan Halaman Login
-    public function showLogin()
+    /**
+     * Tampilkan halaman Login.
+     */
+    public function showLogin(): View
     {
         return view('pages.auth.login');
     }
 
-    // 2. Memproses Data Login
-    public function login(Request $request)
+    /**
+     * Proses autentikasi pengguna.
+     */
+    public function login(Request $request): RedirectResponse
     {
-        // Validasi input
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Cek kecocokan data dengan database
-        $remember = $request->has('remember');
-        if (Auth::attempt($credentials, $remember)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            
-            // Jika sukses, lempar ke halaman Builder
-            return redirect()->intended('/builder');
+            return redirect()->intended('/');
         }
 
-        // Jika gagal, kembalikan ke halaman login dengan pesan error
-        return back()->withErrors([
-            'email' => 'Email atau password salah, bro!',
-        ])->onlyInput('email');
+        return back()
+            ->withErrors(['email' => 'Email atau password salah.'])
+            ->onlyInput('email');
     }
 
-    // 3. Menampilkan Halaman Register
-    public function showRegister()
+    /**
+     * Tampilkan halaman Register.
+     */
+    public function showRegister(): View
     {
         return view('pages.auth.register');
     }
 
-    // 4. Memproses Data Register
-    public function register(Request $request)
+    /**
+     * Proses pendaftaran pengguna baru.
+     */
+    public function register(Request $request): RedirectResponse
     {
-        // Validasi form register
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        // Masukkan user baru ke database
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Default role dari migration kita
+            'role'     => 'user',
         ]);
 
-        // Langsung login-kan otomatis setelah daftar
         Auth::login($user);
 
-        return redirect('/builder');
+        return redirect('/');
     }
 
-    // 5. Proses Logout
-    public function logout(Request $request)
+    /**
+     * Proses logout pengguna.
+     */
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        return redirect('/login');
+
+        return redirect()->route('login');
     }
 }

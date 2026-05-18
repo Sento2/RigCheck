@@ -3,52 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Component;
+use App\Models\Rig;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class ComponentController extends Controller
 {
-    // Menampilkan semua list komponen PC
-    public function index(Request $request)
+    /**
+     * Tampilkan semua komponen (dengan opsional filter kategori).
+     */
+    public function index(Request $request): View
     {
-        // Fitur filter kategori (cpu, gpu, ram, dll)
-        $query = Component::query();
-        if ($request->has('category') && $request->category != '') {
-            $query->where('category', $request->category);
-        }
+        $components = Component::query()
+            ->when($request->filled('category'), fn ($q) => $q->where('category', $request->category))
+            ->latest()
+            ->get();
 
-        $components = $query->latest()->get();
         return view('components.index', compact('components'));
     }
 
-    // Mengambil detail komponen (untuk ajax/modal spesifikasi JSON)
-    public function show($id)
+    /**
+     * Kembalikan detail komponen sebagai JSON.
+     */
+    public function show(int $id): JsonResponse
     {
-        $component = Component::findOrFail($id);
-        return response()->json($component);
+        return response()->json(Component::findOrFail($id));
     }
 
-    // Simpan komponen baru (Fitur Admin)
-    public function store(Request $request)
+    /**
+     * Simpan komponen baru (admin).
+     */
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max::255',
-            'category' => 'required|in:cpu,gpu,ram,storage,motherboard,psu,base_system',
-            'price' => 'required|numeric',
-            'wattage' => 'required|numeric',
-            'spesifikasi' => 'nullable|array' // Disimpan otomatis sebagai JSON berkat casting model
+            'name'        => 'required|string|max:255',
+            'category'    => 'required|in:cpu,gpu,ram,storage,motherboard,psu,base_system',
+            'price'       => 'required|numeric',
+            'wattage'     => 'required|numeric',
+            'spesifikasi' => 'nullable|array',
         ]);
 
         Component::create($validated);
-        return back()->with('success', 'Komponen berhasil ditambah, bro!');
+
+        return back()->with('success', 'Komponen berhasil ditambahkan!');
     }
 
-    public function builder()
+    /**
+     * Tampilkan halaman builder dengan daftar komponen terkelompok.
+     */
+    public function builder(Request $request): View
     {
-        // Tarik semua komponen dan kelompokkan berdasarkan kategori
-        $components = Component::all()->groupBy('category');
-        
-        // Lempar ke tampilan builder (tempat kamu menaruh desain Stitch AI)
-        return view('pages.rigs.builder', compact('components'));
-    }
+        $components = Component::query()
+            ->when($request->filled('category'), fn ($q) => $q->where('category', $request->category))
+            ->get()
+            ->groupBy('category');
 
+        $currentRig = auth()->check()
+            ? Rig::where('user_id', auth()->id())->where('is_completed', false)->first()
+            : null;
+
+        return view('pages.rigs.builder', compact('components', 'currentRig'));
+    }
 }

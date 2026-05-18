@@ -4,24 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Component;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AutoBuilderController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Proporsi alokasi budget per kategori komponen.
+     */
+    private const BUDGET_RATIOS = [
+        'cpu'         => 0.30,
+        'gpu'         => 0.40,
+        'motherboard' => 0.15,
+    ];
+
+    /**
+     * Tampilkan halaman Auto Builder dengan rekomendasi komponen.
+     */
+    public function index(Request $request): View
     {
-        $budget = $request->get('budget', 0);
+        $budget         = (int) $request->get('budget', 0);
         $recommendation = [];
 
         if ($budget > 0) {
-            // Algoritma sederhana pembagian budget rakitan komputer ideal
-            // CPU 30%, GPU 40%, Motherboard 15%, RAM & Sisa 15%
-            $cpuBudget = $budget * 0.30;
-            $gpuBudget = $budget * 0.40;
-            $moboBudget = $budget * 0.15;
+            foreach (self::BUDGET_RATIOS as $category => $ratio) {
+                $limit = $budget * $ratio;
 
-            $recommendation['cpu'] = Component::where('category', 'cpu')->where('price', '<=', $cpuBudget)->orderBy('price', 'desc')->first();
-            $recommendation['gpu'] = Component::where('category', 'gpu')->where('price', '<=', $gpuBudget)->orderBy('price', 'desc')->first();
-            $recommendation['motherboard'] = Component::where('category', 'motherboard')->where('price', '<=', $moboBudget)->orderBy('price', 'desc')->first();
+                $recommendation[$category] = Component::where('category', $category)
+                    ->where('price', '<=', $limit)
+                    ->orderByDesc('price')
+                    ->first();
+            }
         }
 
         return view('autobuilder.index', compact('recommendation', 'budget'));

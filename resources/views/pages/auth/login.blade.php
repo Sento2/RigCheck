@@ -1,69 +1,68 @@
-@extends('layouts.auth')
-@section('title', 'Login')
+@extends('layouts.app')
+
+@section('title', 'Login - RigCheck')
+
 @section('content')
-<div class="glass-card border border-outline-variant p-10 rounded-xl shadow-2xl premium-shadow">
-    <header class="mb-10 text-center">
-        <div class="flex justify-center mb-4">
-            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg">
-                <span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">terminal</span>
-            </div>
-        </div>
-        <h1 class="font-headline-lg text-[32px] font-bold text-white tracking-tight mb-1">RigCheck</h1>
-        <p class="font-body-md text-on-surface-variant">Access your hardware garage</p>
-    </header>
-
-    <form method="POST" action="{{ url('/login') }}" class="space-y-6">
-        @csrf
+<div class="min-h-[calc(100vh-80px)] w-full flex items-center justify-center bg-canvas-soft py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md bg-canvas rounded-[12px] border border-hairline shadow-[0_8px_24px_rgba(0,0,0,0.06)] p-8">
         
-        <div class="group">
-            <label class="block font-label-tech text-[12px] text-on-surface-variant mb-2 ml-1" for="email">
-                EMAIL ADDRESS
-            </label>
-            <div class="relative clean-focus transition-all duration-300 border border-outline-variant bg-surface-container-lowest rounded-lg overflow-hidden">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">alternate_email</span>
-                </div>
-                <input class="block w-full pl-[48px] pr-4 py-3 bg-transparent border-none text-on-surface font-label-tech focus:ring-0 placeholder:text-slate-600 outline-none" 
-                    id="email" name="email" value="test@example.com" type="email" required/>
+        <div class="text-center mb-8">
+            <h2 class="text-[28px] font-medium text-ink tracking-[-0.42px] mb-2">Welcome back</h2>
+            <p class="text-[14px] text-ink-mute">Masukkan detail Anda untuk masuk.</p>
+        </div>
+
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-primary-soft/10 border border-primary rounded-[8px] flex items-center gap-3 text-ink">
+                <span class="material-symbols-outlined text-primary">check_circle</span>
+                <p class="text-[14px] font-medium">{{ session('success') }}</p>
             </div>
-        </div>
+        @endif
 
-        <div class="group">
-            <label class="block font-label-tech text-[12px] text-on-surface-variant mb-2 ml-1" for="password">
-                PASSWORD
-            </label>
-            <div class="relative clean-focus transition-all duration-300 border border-outline-variant bg-surface-container-lowest rounded-lg overflow-hidden">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">key</span>
-                </div>
-                <input class="block w-full pl-[48px] pr-4 py-3 bg-transparent border-none text-on-surface font-label-tech focus:ring-0 placeholder:text-slate-600 outline-none" 
-                    id="password" name="password" value="password" type="password" required/>
+        @if($errors->any())
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-[8px] flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <ul class="text-[14px] text-red-700 font-medium">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+        @endif
+
+        <form action="{{ route('login.process') }}" method="POST" class="space-y-6">
+            @csrf
+
+            <div>
+                <label for="email" class="block text-[14px] font-medium text-ink mb-1.5">Alamat Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" required 
+                       pattern=".*@.*" title="Email must contain an '@' symbol."
+                       class="w-full bg-canvas border border-hairline rounded-[6px] px-3 py-2 text-[16px] text-ink focus:outline-none focus:border-hairline-strong transition-colors"
+                       placeholder="you@example.com">
+            </div>
+
+            <div>
+                <label for="password" class="block text-[14px] font-medium text-ink mb-1.5">Kata Sandi</label>
+                <div class="relative">
+                    <input id="password" name="password" type="password" autocomplete="current-password" required 
+                           class="w-full bg-canvas border border-hairline rounded-[6px] px-3 py-2 pr-10 text-[16px] text-ink focus:outline-none focus:border-hairline-strong transition-colors"
+                           placeholder="••••••••">
+                    <button type="button" onclick="const p = document.getElementById('password'); const i = this.querySelector('span'); if(p.type === 'password'){ p.type = 'text'; i.innerText = 'visibility_off'; } else { p.type = 'password'; i.innerText = 'visibility'; }" class="absolute inset-y-0 right-0 pr-3 flex items-center text-ink-mute hover:text-ink">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-[6px] text-[14px] font-medium text-on-primary bg-primary hover:bg-primary-deep transition-colors focus:outline-none">
+                    Sign in
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 text-center text-[14px] text-ink-mute">
+            Belum punya akun? 
+            <a href="{{ route('register') }}" class="font-medium text-ink hover:underline">Daftar</a>
         </div>
-
-        <div class="flex items-center justify-between py-2">
-            <label class="flex items-center space-x-2 cursor-pointer group">
-                <input type="checkbox" name="remember" class="h-4 w-4 rounded border-outline-variant bg-surface-container-lowest text-white focus:ring-white focus:ring-offset-background checked:bg-white checked:text-black"/>
-                <span class="font-body-sm text-[14px] text-on-surface-variant group-hover:text-on-surface transition-colors">Remember Me</span>
-            </label>
-            <a class="font-body-sm text-[14px] text-secondary hover:text-secondary-fixed transition-colors hover:underline" href="#">
-                Forgot Password?
-            </a>
-        </div>
-
-        <button class="w-full bg-white hover:bg-slate-200 active:scale-[0.98] transition-all duration-200 py-4 px-10 rounded-lg text-black font-extrabold flex items-center justify-center space-x-4 mt-4 shadow-md" type="submit">
-            <span class="font-label-tech text-[12px] tracking-widest">INITIALIZE LOGIN</span>
-            <span class="material-symbols-outlined text-[18px]">bolt</span>
-        </button>
-    </form>
-
-    <footer class="mt-8 pt-6 border-t border-outline-variant/30 text-center">
-        <p class="font-body-sm text-[14px] text-on-surface-variant">
-            Don't have an account? 
-            <a class="text-white font-bold ml-1 hover:underline decoration-white decoration-2 underline-offset-4" href="{{ url('/register') }}">
-                Create one
-            </a>
-        </p>
-    </footer>
+    </div>
 </div>
 @endsection
