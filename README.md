@@ -264,6 +264,9 @@ Kontribusi sangat diterima! Silakan:
 | | Nama | Peran |
 |:---:|-----|-------|
 | 👨‍💻 | **Sento** | Lead Developer · UI/UX · AI Integration |
+| 👩‍💻 | **Annisa** | Frontend Developer · Design System |
+| 👨‍💻 | **Haddy** | Backend Developer · Database Design |
+| 👨‍💻 | **Pandi** | Full Stack Developer · QA Testing |
 
 </div>
 
