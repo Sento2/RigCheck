@@ -35,17 +35,17 @@
             <div>
                 <label for="email" class="block text-[14px] font-medium text-ink mb-1.5">Alamat Email</label>
                 <input id="email" name="email" type="email" autocomplete="email" required 
-                       pattern=".*@.*" title="Email must contain an '@' symbol."
-                       class="w-full bg-canvas border border-hairline rounded-[6px] px-3 py-2 text-[16px] text-ink focus:outline-none focus:border-hairline-strong transition-colors"
-                       placeholder="you@example.com">
+                    pattern=".*@.*" title="Email must contain an '@' symbol."
+                    class="w-full bg-canvas border border-hairline rounded-[6px] px-3 py-2 text-[16px] text-ink focus:outline-none focus:border-hairline-strong transition-colors"
+                    placeholder="you@example.com">
             </div>
 
             <div>
                 <label for="password" class="block text-[14px] font-medium text-ink mb-1.5">Kata Sandi</label>
                 <div class="relative">
                     <input id="password" name="password" type="password" autocomplete="current-password" required 
-                           class="w-full bg-canvas border border-hairline rounded-[6px] px-3 py-2 pr-10 text-[16px] text-ink focus:outline-none focus:border-hairline-strong transition-colors"
-                           placeholder="••••••••">
+                        class="w-full bg-canvas border border-hairline rounded-[6px] px-3 py-2 pr-10 text-[16px] text-ink focus:outline-none focus:border-hairline-strong transition-colors"
+                        placeholder="••••••••">
                     <button type="button" onclick="const p = document.getElementById('password'); const i = this.querySelector('span'); if(p.type === 'password'){ p.type = 'text'; i.innerText = 'visibility_off'; } else { p.type = 'password'; i.innerText = 'visibility'; }" class="absolute inset-y-0 right-0 pr-3 flex items-center text-ink-mute hover:text-ink">
                         <span class="material-symbols-outlined text-[18px]">visibility</span>
                     </button>

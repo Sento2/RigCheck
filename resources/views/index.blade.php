@@ -40,13 +40,11 @@
 
         {{-- CTAs --}}
         <div class="animate-fade-up delay-300 flex flex-col sm:flex-row items-center gap-4 mb-16">
-            <a href="{{ route('builder.index') }}"
-               class="group bg-primary text-on-primary px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-primary-deep transition-all flex items-center justify-center gap-2 min-w-[180px] shadow-[0_2px_12px_rgba(62,207,142,0.4)] hover:shadow-[0_4px_20px_rgba(62,207,142,0.5)] hover:-translate-y-0.5">
+            <a href="{{ route('builder.index') }}"class="group bg-primary text-on-primary px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-primary-deep transition-all flex items-center justify-center gap-2 min-w-[180px] shadow-[0_2px_12px_rgba(62,207,142,0.4)] hover:shadow-[0_4px_20px_rgba(62,207,142,0.5)] hover:-translate-y-0.5">
                 <span class="material-symbols-outlined text-[18px]">construction</span>
                 Mulai Merakit
             </a>
-            <a href="{{ route('autobuilder.index') }}"
-               class="bg-canvas-night text-on-dark px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-canvas-night-soft transition-all flex items-center justify-center gap-2 min-w-[180px] hover:-translate-y-0.5">
+            <a href="{{ route('autobuilder.index') }}"class="bg-canvas-night text-on-dark px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-canvas-night-soft transition-all flex items-center justify-center gap-2 min-w-[180px] hover:-translate-y-0.5">
                 <span class="material-symbols-outlined text-[18px]">magic_button</span>
                 Auto Builder
             </a>

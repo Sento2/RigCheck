@@ -72,11 +72,11 @@
             <button type="submit"
                     title="Tambah ke rakitan"
                     class="bg-primary/10 border border-primary/20 text-primary
-                           hover:bg-primary hover:text-on-primary
-                           px-[14px] py-[8px] rounded-[8px]
-                           transition-all duration-150
-                           flex items-center gap-1.5 text-[13px] font-medium
-                           active:scale-95">
+                        hover:bg-primary hover:text-on-primary
+                        px-[14px] py-[8px] rounded-[8px]
+                        transition-all duration-150
+                        flex items-center gap-1.5 text-[13px] font-medium
+                        active:scale-95">
                 <span class="material-symbols-outlined text-[16px]">add</span>
                 <span class="hidden sm:inline">Tambah</span>
             </button>

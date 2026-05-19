@@ -19,7 +19,7 @@
 
         @foreach($sidebarCategories as $key => $data)
             <a href="{{ route('builder.index', ['category' => $key]) }}" 
-               class="flex items-center gap-3 px-3 py-2 rounded-[6px] transition-colors {{ $currentCategory === $key ? 'bg-hairline-cool text-ink' : 'text-ink-mute hover:bg-hairline-cool-2 hover:text-ink' }}">
+            class="flex items-center gap-3 px-3 py-2 rounded-[6px] transition-colors {{ $currentCategory === $key ? 'bg-hairline-cool text-ink' : 'text-ink-mute hover:bg-hairline-cool-2 hover:text-ink' }}">
                 <span class="material-symbols-outlined text-[18px]">{{ $data['icon'] }}</span>
                 <span class="text-[14px]">{{ $data['label'] }}</span>
             </a>
