@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rig;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class ProfileController extends Controller
      */
     public function index(): View
     {
-        $user      = Auth::user();
+        $user      = User::query()->findOrFail(Auth::id());
         $totalRigs = Rig::where('user_id', $user->id)->count();
 
         return view('pages.profile.index', compact('user', 'totalRigs'));
@@ -28,7 +29,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        $user = Auth::user();
+        $user = User::query()->findOrFail(Auth::id());
 
         $request->validate([
             'name'  => ['required', 'string', 'max:255'],
@@ -52,7 +53,7 @@ class ProfileController extends Controller
             'password'         => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user           = Auth::user();
+        $user           = User::query()->findOrFail(Auth::id());
         $user->password = Hash::make($request->password);
         $user->save();
 

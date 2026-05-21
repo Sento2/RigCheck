@@ -7,6 +7,7 @@ use App\Models\Rig;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -16,7 +17,7 @@ class AdminController extends Controller
      */
     public function index(): View|RedirectResponse
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()?->role !== 'admin') {
             return redirect()->route('dashboard')->with('error', 'Akses tidak diizinkan.');
         }
 

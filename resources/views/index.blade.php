@@ -10,7 +10,7 @@
     {{-- Decorative background grid --}}
     <div class="absolute inset-0 pointer-events-none" style="
         background-image: linear-gradient(rgba(62,207,142,0.04) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(62,207,142,0.04) 1px, transparent 1px);
+                        linear-gradient(90deg, rgba(62,207,142,0.04) 1px, transparent 1px);
         background-size: 48px 48px;
     "></div>
 
@@ -174,12 +174,12 @@
         <p class="text-[17px] text-on-dark/60 mb-10 max-w-xl mx-auto">Bergabung dengan RigCheck dan mulai merakit dengan panduan AI yang lebih cerdas dari siapa pun.</p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="{{ route('register') }}"
-               class="bg-primary text-on-primary px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-primary-deep transition-all hover:-translate-y-0.5 flex items-center gap-2 shadow-[0_4px_20px_rgba(62,207,142,0.4)]">
+                class="bg-primary text-on-primary px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-primary-deep transition-all hover:-translate-y-0.5 flex items-center gap-2 shadow-[0_4px_20px_rgba(62,207,142,0.4)]">
                 <span class="material-symbols-outlined text-[18px]">person_add</span>
                 Daftar Gratis
             </a>
             <a href="{{ route('builder.index') }}"
-               class="border border-white/20 text-on-dark px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-white/10 transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                class="border border-white/20 text-on-dark px-[28px] py-[13px] rounded-[8px] font-medium text-[16px] hover:bg-white/10 transition-all hover:-translate-y-0.5 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">construction</span>
                 Coba Tanpa Daftar
             </a>
